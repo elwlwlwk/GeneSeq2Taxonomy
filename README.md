@@ -12,7 +12,7 @@ http://www.mecs-press.org/ijitcs/ijitcs-v4-n8/IJITCS-V4-N8-3.pdf
 
 2. Apply Fourier transform to extract it's spectral features. Manipulate Fourier transformed data to train neural net.
 I split frequence axis by 1000 area and picked up max value for each area. I've got about 85% accuracy using this method.(Best method I've tried. See below to other methods I've tried)
-For example if Fourier transformed data is [1, 2, 3, 6, 8, 7, 5, 3, 1, 4, 6, 4]. I split frequence axis to 3 and pick max value, then result will be [3, 8, 5, 6].
+For example if Fourier transformed data is [1, 2, 3, 6, 8, 7, 5, 3, 1, 4, 6, 4]. I split frequence axis to 4 and pick max value, then result will be [3, 8, 5, 6].
 
 3. Use neural net, train data.
 
