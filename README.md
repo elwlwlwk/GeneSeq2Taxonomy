@@ -91,7 +91,7 @@ Result: Failed cause there's lots of peak around 2/3 pi area. It means there's m
 - Pick frequency order by magnitude at band pass filtered data.
 I wiped up data around 2/3 pi and 0 pi. And pick frequences order by it's magnitude.
 
-Result: Accuracy about 80% classifing Archaea and Bacteria. But between Archaea, Bacteria and Protozoa, accuracy falls around 65%.
+Result: Accuracy about 80% classifing Archaea and Bacteria. But classifying Archaea, Bacteria and Protozoa, accuracy falls around 65%.
 
 - Pick magnitude at random frequency and pick best classifier.
 
