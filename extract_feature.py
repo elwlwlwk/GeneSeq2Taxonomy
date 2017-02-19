@@ -3,6 +3,7 @@ import os
 import numpy as np
 import fft
 import math
+from oct2py import octave
 
 def get_sequence(name):
 	with open(name) as f:
@@ -31,7 +32,7 @@ def calc_z_curve(sequence):
 	return [xn , yn, zn]
 
 def positive_fft(seq):
-	fs= np.absolute(fft.transform(seq))
+	fs= np.absolute(octave.calc_fft(seq)[0])
 	return fs[0:math.ceil(len(fs)/2)]
 
 def z_curve_fft(z_curve):
