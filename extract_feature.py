@@ -1,6 +1,7 @@
 import sys
 import os
 import numpy as np
+import fft
 import math
 
 def get_sequence(name):
@@ -30,7 +31,7 @@ def calc_z_curve(sequence):
 	return [xn , yn, zn]
 
 def positive_fft(seq):
-	fs= np.absolute(np.fft.fft(seq))
+	fs= np.absolute(fft.transform(seq))
 	return fs[0:math.ceil(len(fs)/2)]
 
 def z_curve_fft(z_curve):
@@ -57,10 +58,13 @@ if __name__=='__main__':
 	for seq_file in file_list:
 		print(seq_file)
 		seqs= get_sequence(taxonomy+'/'+seq_file)
-		z_curves= list(map(lambda seq: calc_z_curve(seq), seqs))
-		fft_results= list(map(lambda z_curve: z_curve_fft(z_curve), z_curves))
-		features= list(map(lambda fz: extract_features(fz), fft_results))
+		if len(seqs)==0:
+			continue
 		feature_idx=1
-		for feature in features:
+		for seq in seqs:
+			print(seq_file+"_"+str(feature_idx))
+			z_curve= calc_z_curve(seq)
+			fft_result= z_curve_fft(z_curve)
+			feature= extract_features(fft_result)
 			np.save(taxonomy+'/'+ seq_file+'_'+str(feature_idx), feature)
 			feature_idx+=1
