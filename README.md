@@ -12,9 +12,7 @@ Using FFT and Neural Net to identify gene sequence's taxonomy.
 
 ## How to use
 
-### Directory tree
-
-0. Collect lots of sequence data.
+#### Collect lots of sequence data.
 
 ```
 |-GeneSeq2Taxonomy
@@ -29,7 +27,7 @@ Using FFT and Neural Net to identify gene sequence's taxonomy.
   |-train.py
 ```
 
-1. Extract features.
+#### Extract features.
 
 Extract features executing extract_features.py for each directory.
 
@@ -54,7 +52,7 @@ protozoa.1.1.genomic.fna_2
 ```
 Then .npy files are generated at each directory.
 
-2. Train features.
+#### Train features.
 
 Open Python shell, execute train method at train.py
 
