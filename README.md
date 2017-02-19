@@ -12,7 +12,7 @@ Using FFT and Neural Net to identify gene sequence's taxonomy.
 
 ## How to use
 
-#### Collect lots of sequence data.
+#### Collect lots of sequence data
 
 ```
 |-GeneSeq2Taxonomy
@@ -27,7 +27,7 @@ Using FFT and Neural Net to identify gene sequence's taxonomy.
   |-train.py
 ```
 
-#### Extract features.
+#### Extract features
 
 Extract features executing extract_features.py for each directory.
 
@@ -52,7 +52,7 @@ protozoa.1.1.genomic.fna_2
 ```
 Then .npy files are generated at each directory.
 
-#### Train features.
+#### Train data
 
 Open Python shell, execute train method at train.py
 
@@ -65,7 +65,7 @@ Type "help", "copyright", "credits" or "license" for more information.
 >>> clf= train(steps=50000)
 ```
 
-2/3 of datas are used for train and 1/2 datas are used for calculate accuracy.
+2/3 of data are used for train and 1/2 data are used for calculate accuracy.
 Predictions are printed after training.
 Tensorflow checkpoint is saved at GeneSeq2Taxonomy/dnn_model.
 
