@@ -3,50 +3,33 @@ import json
 import tensorflow as tf
 import numpy as np
 
-def get_complete_list(taxonomy):
-	faa_list= list(filter(lambda x:x[-3:]=='faa', os.listdir(taxonomy)))
-	complete_list=[]
-	for faa_file in faa_list:
-		with open(taxonomy+'/'+faa_file) as f:
-			index= f.readline()
-			if 'complete' in index:
-				complete_list.append(faa_file)
-	return complete_list
-
-def get_dct_data(taxonomy):
-	#faa_list= get_complete_list(taxonomy)
-	faa_list= list(filter(lambda x:x[-3:]=='fft', os.listdir(taxonomy)))
+def load_data(taxonomy):
+	data_list= list(filter(lambda x:x[-3:]=='npy', os.listdir(taxonomy)))
 	result=[]
-	for faa_file in faa_list:
-		with open(taxonomy+'/'+faa_file) as f:
-			dct_data= f.read().strip().split('\n')[-3:]
-			dct_data[0]= json.loads('['+dct_data[0].strip().replace(' ',',')+']')
-			dct_data[1]= json.loads('['+dct_data[1].strip().replace(' ',',')+']')
-			dct_data[2]= json.loads('['+dct_data[2].strip().replace(' ',',')+']')
-			z_curve_data=[]
-			z_curve_data+= dct_data[0]
-			z_curve_data+= dct_data[1]
-			z_curve_data+= dct_data[2]
-			result.append(z_curve_data)
+	for data_file in data_list:
+		result.append(np.load('%s/%s' %(taxonomy, data_file)))
 		if len(result)%1000== 0:
-			print("%s: %d/%d" %(taxonomy, len(result), len(faa_list)))
+			print("%s: %d/%d" %(taxonomy, len(result), len(data_list)))
 
 	return np.array(result, dtype='f')
 
 def train(steps=10000):
-	archaea_data= get_dct_data('archaea')
-	bacteria_data= get_dct_data('bacteria')
-	protozoa_data= get_dct_data('protozoa')
+	archaea_data= load_data('archaea')
+	bacteria_data= load_data('bacteria')
+	protozoa_data= load_data('protozoa')
+	fungi_data= load_data('fungi')
 
 	val_len= min(len(archaea_data), len(bacteria_data), len(protozoa_data))/3
 
 	archaea_train= archaea_data[0:int(len(archaea_data)-val_len)]
 	bacteria_train= bacteria_data[0:int(len(bacteria_data)-val_len)]
 	protozoa_train= protozoa_data[0:int(len(protozoa_data)-val_len)]
+	fungi_train= fungi_data[0:int(len(fungi_data)-val_len)]
 
 	archaea_val= archaea_data[int(len(archaea_data)-val_len):]
 	bacteria_val= bacteria_data[int(len(bacteria_data)-val_len):]
 	protozoa_val= protozoa_data[int(len(protozoa_data)-val_len):]
+	fungi_val= fungi_data[int(len(fungi_data)-val_len):]
 
 	x_train= np.append(archaea_train, bacteria_train, axis=0)
 	x_train= np.append(x_train, protozoa_train, axis=0)
@@ -60,6 +43,8 @@ def train(steps=10000):
 		y_train.append([1])
 	for i in range(len(protozoa_train)):
 		y_train.append([2])
+	for i in range(len(fungi_train)):
+		y_train.append([3])
 	y_train= np.array(y_train)
 
 	for i in range(len(archaea_val)):
@@ -68,6 +53,8 @@ def train(steps=10000):
 		y_val.append([1])
 	for i in range(len(protozoa_val)):
 		y_val.append([2])
+	for i in range(len(fungi_val)):
+		y_val.append([3])
 	y_val= np.array(y_val)
 	'''
 	x= tf.placeholder(tf.float64, [None, x_data.shape[1]])
@@ -92,7 +79,7 @@ def train(steps=10000):
 
 	feature_columns = [tf.contrib.layers.real_valued_column("", dimension=x_train.shape[1])]
 
-	clf= learn.DNNClassifier(feature_columns=feature_columns, hidden_units=[int(x_train.shape[1]/10),int(x_train.shape[1]/100)], n_classes=3, model_dir='./dnn_model')
+	clf= learn.DNNClassifier(feature_columns=feature_columns, hidden_units=[int(x_train.shape[1]/10),int(x_train.shape[1]/100)], n_classes=4, model_dir='./dnn_model')
 	clf.fit(x=x_train, y=y_train, steps=steps)
 
 	predictions= list(clf.predict(np.asarray(x_val, dtype=np.float32)))
