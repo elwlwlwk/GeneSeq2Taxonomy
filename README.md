@@ -29,4 +29,5 @@ I wiped up data around 2/3 pi and 0 pi. And pick frequences order by it's magnit
 Result: Accuracy about 80% classifing Archaea and Bacteria. But between Archaea, Bacteria and Protozoa, accuracy falls around 65%.
 
 - Pick magnitude at random frequency and pick best classifier.
+
 Result: Failed. Frequency is near real number. Too many learning case. Accuracies are about 70% classifing Archaea and Bacteria.
