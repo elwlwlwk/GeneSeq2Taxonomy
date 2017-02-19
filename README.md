@@ -3,8 +3,73 @@ Taxonomy Classifer Using Gene Sequence.
 
 Using FFT and Neural Net to identify gene sequence's taxonomy.
 
+## Requires
+- Python3
+- numpy
+- oct2py
+- tensorflow
+- Octave
+
+## How to use
+
+#### Collect lots of sequence data
+
+```
+|-GeneSeq2Taxonomy
+  |-archaea
+    |- *.fna
+  |-bacteria
+    |- *.fna
+  |-protozoa
+    |- *.fna
+  |-calc_fft.m
+  |-extract_feature.py
+  |-train.py
+```
+
+#### Extract features
+
+Extract features executing extract_features.py for each directory.
+
+```
+>python3 extract_feature.py archaea
+Candidatus_Altiarchaeales_archaeon_WOR_SM1_SCG.fna
+Candidatus_Altiarchaeales_archaeon_WOR_SM1_SCG.fna_1
+Candidatus_Altiarchaeales_archaeon_WOR_SM1_SCG.fna_2
+Candidatus_Altiarchaeales_archaeon_WOR_SM1_SCG.fna_3
+...
+>python3 extract_feature.py bacteria
+Arthrobacter_globiformis.fna
+Arthrobacter_globiformis.fna_1
+Arthrobacter_globiformis.fna_2
+Arthrobacter_globiformis.fna_3
+...
+>python3 extract_feature.py bacteria
+protozoa.1.1.genomic.fna
+protozoa.1.1.genomic.fna_1
+protozoa.1.1.genomic.fna_2
+...
+```
+Then .npy files are generated at each directory.
+
+#### Train data
+
+Open Python shell, execute train method at train.py
+
+```
+python3
+Python 3.6.0 |Anaconda 4.3.0 (64-bit)| (default, Dec 23 2016, 12:22:00) 
+[GCC 4.4.7 20120313 (Red Hat 4.4.7-1)] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import train from train
+>>> clf= train(steps=50000)
+```
+
+2/3 of data are used for train and 1/2 data are used for calculate accuracy.
+Predictions are printed after training.
+Tensorflow checkpoint is saved at GeneSeq2Taxonomy/dnn_model.
+
 ## How it works
-0. Collect lots of sequence data.
 
 1. Translate gene sequence to z-curve sequence. It's for reduce training cost by reducing features.
 I think there's no meaningful difference comparing other methods.
@@ -26,7 +91,7 @@ Result: Failed cause there's lots of peak around 2/3 pi area. It means there's m
 - Pick frequency order by magnitude at band pass filtered data.
 I wiped up data around 2/3 pi and 0 pi. And pick frequences order by it's magnitude.
 
-Result: Accuracy about 80% classifing Archaea and Bacteria. But between Archaea, Bacteria and Protozoa, accuracy falls around 65%.
+Result: Accuracy about 80% classifing Archaea and Bacteria. But classifying Archaea, Bacteria and Protozoa, accuracy falls around 65%.
 
 - Pick magnitude at random frequency and pick best classifier.
 
