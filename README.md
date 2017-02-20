@@ -65,7 +65,7 @@ Type "help", "copyright", "credits" or "license" for more information.
 >>> clf= train(steps=50000)
 ```
 
-2/3 of data are used for train and 1/2 data are used for calculate accuracy.
+2/3 of data are used for train and 1/2 data are used for calculate precision.
 Predictions are printed after training.
 Tensorflow checkpoint is saved at GeneSeq2Taxonomy/dnn_model.
 
@@ -76,7 +76,7 @@ I think there's no meaningful difference comparing other methods.
 http://www.mecs-press.org/ijitcs/ijitcs-v4-n8/IJITCS-V4-N8-3.pdf
 
 2. Apply Fourier transform to extract it's spectral features. Manipulate Fourier transformed data to train neural net.
-I split frequence axis by 1000 area and picked up max value for each area. I've got over 90% accuracy using this method classifying archaea, bacteria, protozoa and fungi.(Best method I've tried. See below to other methods I've tried)
+I split frequence axis by 1000 area and picked up max value for each area. I've got over 90% precision using this method classifying archaea, bacteria, protozoa and fungi.(Best method I've tried. See below to other methods I've tried)
 For example if Fourier transformed data is [1, 2, 3, 6, 8, 7, 5, 3, 1, 4, 6, 4]. I split frequence axis to 4 and pick max value, then result will be [3, 8, 5, 6].
 
 3. Use neural net, train data.
@@ -91,8 +91,8 @@ Result: Failed cause there's lots of peak around 2/3 pi area. It means there's m
 - Pick frequency order by magnitude at band pass filtered data.
 I wiped up data around 2/3 pi and 0 pi. And pick frequences order by it's magnitude.
 
-Result: Accuracy about 80% classifing Archaea and Bacteria. But classifying Archaea, Bacteria and Protozoa, accuracy falls around 65%.
+Result: Precision about 80% classifing Archaea and Bacteria. But classifying Archaea, Bacteria and Protozoa, precision falls around 65%.
 
 - Pick magnitude at random frequency and pick best classifier.
 
-Result: Failed. Frequency is near real number. Too many learning case. Accuracies are about 70% classifing Archaea and Bacteria.
+Result: Failed. Frequency is near real number. Too many learning case. Precisions are about 70% classifing Archaea and Bacteria.
