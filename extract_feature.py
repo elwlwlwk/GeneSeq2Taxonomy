@@ -5,10 +5,10 @@ import fft
 import math
 from oct2py import octave
 
-def get_sequence(name):
+def get_sequence(name, feature_number):
 	with open(name) as f:
 		seqs= f.read().upper().split('>')
-		seqs= list(filter(lambda seq: len(seq)>15000, map(lambda seq: ''.join(seq.split('\n')[1:]),seqs)))
+		seqs= list(filter(lambda seq: len(seq)>feature_number*2, map(lambda seq: ''.join(seq.split('\n')[1:]),seqs)))
 	return seqs
 
 def calc_z_curve(sequence):
@@ -44,9 +44,9 @@ def extract_features(fz, features= 1000):
 	yf=[]
 	zf=[]
 	for i in range(features):
-		xf.append(max(fz[0][int(length/features*i):int(length/features*(i+1))]))
-		yf.append(max(fz[1][int(length/features*i):int(length/features*(i+1))]))
-		zf.append(max(fz[2][int(length/features*i):int(length/features*(i+1))]))
+		xf.append(max(np.concatenate((fz[0][int(length/features*i):max(int(length/features*(i+1)),int(length/features*i)+1)],[0]))))
+		yf.append(max(np.concatenate((fz[1][int(length/features*i):max(int(length/features*(i+1)),int(length/features*i)+1)],[0]))))
+		zf.append(max(np.concatenate((fz[2][int(length/features*i):max(int(length/features*(i+1)),int(length/features*i)+1)],[0]))))
 	
 	xf= np.divide(xf, np.max(xf))
 	yf= np.divide(yf, np.max(yf))
@@ -56,9 +56,10 @@ def extract_features(fz, features= 1000):
 if __name__=='__main__':
 	taxonomy= sys.argv[1]
 	file_list= list(filter(lambda x: 'fna' == x[-3:], os.listdir(taxonomy)))
+	feature_number= 2000
 	for seq_file in file_list:
 		print(seq_file)
-		seqs= get_sequence(taxonomy+'/'+seq_file)
+		seqs= get_sequence(taxonomy+'/'+seq_file, feature_number)
 		if len(seqs)==0:
 			continue
 		feature_idx=1
@@ -66,6 +67,6 @@ if __name__=='__main__':
 			print(seq_file+"_"+str(feature_idx))
 			z_curve= calc_z_curve(seq)
 			fft_result= z_curve_fft(z_curve)
-			feature= extract_features(fft_result)
+			feature= extract_features(fft_result, feature_number)
 			np.save(taxonomy+'/'+ seq_file+'_'+str(feature_idx), feature)
 			feature_idx+=1
