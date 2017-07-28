@@ -7,7 +7,7 @@ from oct2py import octave
 
 def get_sequence(name, feature_number):
 	with open(name) as f:
-		seqs= f.read().upper().split('>')
+		seqs= f.read().upper().replace('N','').split('>')
 		seqs= list(filter(lambda seq: len(seq)>feature_number*2, map(lambda seq: ''.join(seq.split('\n')[1:]),seqs)))
 	return seqs
 
@@ -26,6 +26,8 @@ def calc_z_curve(sequence):
 			Gn=1
 		elif base=="C":
 			Cn=1
+		elif base=="N":
+			An=Tn=Gn=Cn=0.25
 		xn.append(An+Gn-Cn-Tn)
 		yn.append(An+Cn-Gn-Tn)
 		zn.append(An+Tn-Cn-Gn)
