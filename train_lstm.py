@@ -3,10 +3,9 @@ import tensorflow as tf
 from tensorflow.contrib import rnn
 
 import numpy as np
-from tensorflow.examples.tutorials.mnist import input_data
 
-from train_batch import load_data
-
+import os
+from random import shuffle
 # configuration
 #						O * W + b -> 10 labels for each image, O[? 28], W[28 10], B[10]
 #					   ^ (O: output 28 vec from 28 vec input)
@@ -27,8 +26,20 @@ from train_batch import load_data
 input_vec_size = lstm_size = 4500
 time_step_size = 20 
 
-batch_size = 128
-test_size = 256
+batch_size = 64
+test_size = 128
+
+def load_data(taxonomy):
+	data_list= list(filter(lambda x:x[-3:]=='npy', os.listdir('fna_data/%s' %taxonomy)))[0:2000]
+	result=[]
+	for data_file in data_list:
+		data= np.load('fna_data/%s/%s' %(taxonomy, data_file)).reshape(time_step_size, input_vec_size).tolist()
+		result.append(data)
+		if len(result)%1000== 0:
+			print("%s: %d/%d" %(taxonomy, len(result), len(data_list)))
+
+	return np.array(result, dtype='f')
+
 
 def init_weights(shape):
 	return tf.Variable(tf.random_normal(shape, stddev=0.01))
@@ -55,7 +66,8 @@ def model(X, W, B, lstm_size):
 
 def train():
 
-	tax_list= ['archaea','bacteria','protozoa','fungi','plant','vertebrate','invertebrate']
+	#tax_list= ['archaea','bacteria','protozoa','fungi','plant','vertebrate','invertebrate']
+	tax_list= ['archaea','bacteria']
 	num_classes= len(tax_list)
 	tax_data=[]
 	tax_idx=[]
@@ -63,19 +75,22 @@ def train():
 		data= load_data(tax)
 		tax_data.append(data)
 		idx= [0]*len(tax_list)
-		idx[tax_list.index(tax_list)]=1
+		idx[tax_list.index(tax)]=1
 		tax_idx+= [idx]*len(data)
 	
 	tax_data= np.array(tax_data)
-	tax_data= tax_data.reshape(tax_data.shape[0]*tax_data.shape[1], tax_data.shape[2])
+	tax_data= tax_data.reshape(tax_data.shape[0]*tax_data.shape[1], tax_data.shape[2], tax_data.shape[3])
 	data_idx= list(zip(tax_data, tax_idx))
 	shuffle(data_idx)
 	tax_data, tax_idx= zip(*data_idx)
 	tax_data= np.array(tax_data)
 	tax_idx= np.array(tax_idx)
 
-	trX= tax_data
-	trY= tax_idx
+	train_len= int(len(tax_data)/3)
+	trX= tax_data[0:train_len]
+	trY= tax_idx[0:train_len]
+	teX= tax_data[-train_len:]
+	teY= tax_idx[-train_len:]
 
 	#mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
 	#trX, trY, teX, teY = mnist.train.images, mnist.train.labels, mnist.test.images, mnist.test.labels
@@ -86,8 +101,8 @@ def train():
 	Y = tf.placeholder("float", [None, num_classes])
 
 	# get lstm_size and output 10 labels
-	W = init_weights([lstm_size, 10])
-	B = init_weights([10])
+	W = init_weights([lstm_size, num_classes])
+	B = init_weights([num_classes])
 
 	py_x, state_size = model(X, W, B, lstm_size)
 
