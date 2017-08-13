@@ -10,7 +10,7 @@ from random import random
 def get_sequence(name, feature_number):
 	with open(name) as f:
 		seqs= f.read().upper().replace('N','').split('>')
-		seqs= list(filter(lambda seq: len(seq)>feature_number*2, map(lambda seq: ''.join(seq.split('\n')[1:]),seqs)))
+		seqs= list(filter(lambda seq: len(seq)>feature_number, map(lambda seq: ''.join(seq.split('\n')[1:]),seqs)))
 	return seqs
 
 def calc_z_curve(sequence):
@@ -58,22 +58,23 @@ def extract_features(fz, features= 1000):
 if __name__=='__main__':
 	taxonomy= sys.argv[1]
 	file_list= list(filter(lambda x: 'fna' == x[-3:], os.listdir(taxonomy)))
-	feature_number= 2000
+	feature_number= 1000
 	for seq_file in file_list:
 		print(seq_file)
-		seqs= get_sequence(taxonomy+'/'+seq_file, feature_number)
+		seqs= get_sequence(taxonomy+'/'+seq_file, 1)
 		if len(seqs)==0:
 			continue
 		feature_idx=1
-		max_len= 2000000
+		max_len=feature_number
 		for t_seq in seqs:
 			for seq_idx in range(int((len(t_seq)-1)/max_len)+1):
-				seq= t_seq[seq_idx*max_len: max(seq_idx*max_len+1,(seq_idx+1)*max_len- int(random()*max_len/2))]
-				if len(seq) is 0:
+				seq= t_seq[seq_idx*max_len: (seq_idx+1)*max_len]
+				if len(seq) < feature_number:
 					continue
 				print(seq_file+"_"+str(feature_idx)+"_"+str(len(seq)))
 				z_curve= calc_z_curve(seq)
 				fft_result= z_curve_fft(z_curve)
-				feature= extract_features(fft_result, feature_number)
-				np.save(taxonomy+'/'+ seq_file+'_'+str(feature_idx)+'_z.len_'+str(len(seq)), feature)
+				feature= np.concatenate((fft_result[0], fft_result[1],fft_result[2]))
+				print(feature.shape)
+				np.save(taxonomy+'/'+ seq_file+'_'+str(feature_number)+'_'+str(feature_idx)+'_z.len_'+str(len(seq)), feature)
 				feature_idx+=1
